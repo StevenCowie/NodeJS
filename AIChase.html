@@ -1,0 +1,234 @@
+<html>
+some text here
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+
+<script>
+
+    class bullet {
+        Spawn(x,y) {
+            this.bulletX = 0;
+            this.bulletY = 0;
+
+            this.bulletX = x;
+            this.bulletY = y;
+        }
+        Update() {
+            this.bulletX += BULLET_SPEED;
+        }
+        Draw() {
+            canvasContext.fillStyle = 'blue';
+            canvasContext.fillRect(this.bulletX,this.bulletY,BULLET_WIDTH,BULLET_HEIGHT);
+        }
+        CheckCollision() {
+            if(this.bulletX + BULLET_WIDTH > enemyX &&
+                this.bulletX - BULLET_WIDTH < enemyX &&
+                this.bulletY - BULLET_HEIGHT < enemyY &&
+                this.bulletY + BULLET_HEIGHT > enemyY) {
+                reset();
+            }
+        }
+    }
+
+var canvas;
+var canvasContext;
+var playerX = 50;
+var playerY = 50;
+var player_height = 10;
+var player_width = 10;
+var timer = 0;
+
+var enemyX = 500;
+var enemyY = 500;
+var enemy_height = 10;
+var enemy_width = 10;
+
+//neccessary variables
+var tickX = 10;
+var tickY = 10;
+
+var keyW = false;
+var keyA = false;
+var keyS = false;
+var keyD = false;
+var keySpace = false;
+
+// Bullet variables
+var i;
+var bulletX = 0;
+var bulletY = 0;
+const BULLET_WIDTH = 25;
+const BULLET_HEIGHT = 25;
+var bullets = [];
+const BULLET_DELAY = 15;
+var bulletDelayTimer = BULLET_DELAY;
+const BULLET_SPEED = 20;
+var NUMBER_OF_BULLETS = 1;
+
+
+
+
+var newbullet = new bullet;
+
+window.addEventListener("keydown", onKeyDown, false);
+window.addEventListener("keyup", onKeyUp, false);
+
+function onKeyDown(event) {
+    var keyCode = event.keyCode;
+    switch (keyCode) {
+        case 68: //d
+            keyD = true;
+            break;
+        case 83: //s
+            keyS = true;
+            break;
+        case 65: //a
+            keyA = true;
+            break;
+        case 87: //w
+            keyW = true;
+            break;
+        case 32: // space
+            keySpace = true;
+    }
+}
+
+function onKeyUp(event) {
+    var keyCode = event.keyCode;
+
+    switch (keyCode) {
+        case 68: //d
+            keyD = false;
+            break;
+        case 83: //s
+            keyS = false;
+            break;
+        case 65: //a
+            keyA = false;
+            break;
+        case 87: //w
+            keyW = false;
+            break;
+        case 32: // s[ace
+            keySpace = false;
+    }
+}
+
+window.onload = function() {
+	canvas = document.getElementById('gameCanvas');
+	canvasContext = canvas.getContext('2d');
+
+	var framesPerSecond = 30;
+	setInterval(function() {
+			moveEverything();
+			drawEverything();
+			canvasContext.fillText(timer,  canvas.width/2 - 100, 50);
+            bulletDelayTimer -= 1;
+			}, 1000/framesPerSecond);
+
+}
+
+function moveEverything() {
+    timer += 1/30;
+    computerMovement();
+    for (i = 0; i<bullets.length; i++) {
+        bullets[i].CheckCollision();
+    }
+
+    // KEY SPACE HERE
+    if (keySpace) {
+        if (bulletDelayTimer < 0) {
+            bulletDelayTimer = BULLET_DELAY;
+            newbullet = new bullet();
+            newbullet.Spawn(playerX, playerY);
+            bullets.push(newbullet);
+        }
+    }
+    // if (newbullet)
+    //     newbullet.Update();
+    for (i = 0; i<bullets.length; i++) {
+        bullets[i].Update();
+    }
+    bulletX += 20;
+
+	if (keyD == true){
+	    playerX = playerX + 5
+    }
+    if (keyA == true){
+        playerX = playerX - 5
+    }
+    if (keyW == true){
+        playerY = playerY - 5
+    }
+    if (keyS == true){
+        playerY = playerY + 5
+    }
+    //Enemy collide with player
+    if (playerX + player_width > enemyX &&
+        playerX - player_width < enemyX &&
+        playerY - player_height < enemyY &&
+        playerY + player_height > enemyY) {
+        reset();
+    }
+    //Player collide with side of canvas
+    if (playerX + player_width > canvas.width){
+        playerX = canvas.width - player_width;
+    }
+    if (playerY + player_height > canvas.height){
+        playerY = canvas.height - player_height;
+    }
+    if (playerX  < 0){
+        playerX = 0;
+    }
+    if (playerY  < 0){
+        playerY = 0;
+    }
+}
+// moves "AI to player
+function computerMovement() {
+    if (enemyY < playerY) {
+        enemyY = enemyY + 2;
+    }
+    if (enemyY > playerY) {
+        enemyY = enemyY - 2;
+    }
+    if (enemyX < playerX) {
+        enemyX = enemyX + 2;
+    }
+    if (enemyX > playerX) {
+        enemyX = enemyX -2;
+    }
+}
+
+// Resets game
+function reset() {
+    playerX = 0;
+    playerY = 0;
+    enemyX = canvas.width;
+    enemyY = canvas.height;
+    timer = 0;
+}
+
+
+// Draws all shapes needed
+function drawEverything() {
+	canvasContext.fillStyle = 'black';
+	canvasContext.fillRect(0,0,canvas.width,canvas.height);
+
+	canvasContext.fillStyle = 'white';
+	canvasContext.fillRect(enemyX,enemyY,enemy_width,enemy_height);
+
+	canvasContext.fillStyle = 'red';
+	canvasContext.fillRect(playerX,playerY,player_width,player_height);
+
+	canvasContext.fillStyle = 'blue';
+    canvasContext.fillRect(bulletX,bulletY,BULLET_WIDTH,BULLET_HEIGHT);
+    for (i = 0; i<bullets.length; i++) {
+        bullets[i].Draw();
+    }
+    //canvasContext.fillStyle = 'blue';
+    //canvasContext.fillRect(bulletX,bulletY,bullet_width,bullet_height);
+}
+
+</script>
+
+</html>
