@@ -16,7 +16,7 @@ some text here
             this.bulletX += BULLET_SPEED;
         }
         Draw() {
-            canvasContext.fillStyle = 'blue';
+            canvasContext.fillStyle = 'white';
             canvasContext.fillRect(this.bulletX,this.bulletY,BULLET_WIDTH,BULLET_HEIGHT);
         }
         CheckCollision() {
@@ -25,6 +25,7 @@ some text here
                 this.bulletY - BULLET_HEIGHT < enemyY &&
                 this.bulletY + BULLET_HEIGHT > enemyY) {
                 resetEnemy();
+                playerScore ++;
             }
         }
     }
@@ -36,6 +37,7 @@ var playerY = 50;
 var player_height = 10;
 var player_width = 10;
 var timer = 0;
+var playerScore = 0;
 
 var enemyX = 500;
 var enemyY = 500;
@@ -168,6 +170,7 @@ function moveEverything() {
         playerY - player_height < enemyY &&
         playerY + player_height > enemyY) {
         resetGame();
+        playerScore = 0;
     }
     //Player collide with side of canvas
     if (playerX + player_width > canvas.width){
@@ -226,11 +229,13 @@ function drawEverything() {
 	canvasContext.fillStyle = 'red';
 	canvasContext.fillRect(playerX,playerY,player_width,player_height);
 
-	canvasContext.fillStyle = 'blue';
+	canvasContext.fillStyle = 'white';
     canvasContext.fillRect(bulletX,bulletY,BULLET_WIDTH,BULLET_HEIGHT);
     for (i = 0; i<bullets.length; i++) {
         bullets[i].Draw();
     }
+
+    canvasContext.fillText(playerScore, 100, 100);
     //canvasContext.fillStyle = 'blue';
     //canvasContext.fillRect(bulletX,bulletY,bullet_width,bullet_height);
 }
