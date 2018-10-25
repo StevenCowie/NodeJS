@@ -24,7 +24,7 @@ some text here
                 this.bulletX - BULLET_WIDTH < enemyX &&
                 this.bulletY - BULLET_HEIGHT < enemyY &&
                 this.bulletY + BULLET_HEIGHT > enemyY) {
-                reset();
+                resetEnemy();
             }
         }
     }
@@ -167,7 +167,7 @@ function moveEverything() {
         playerX - player_width < enemyX &&
         playerY - player_height < enemyY &&
         playerY + player_height > enemyY) {
-        reset();
+        resetGame();
     }
     //Player collide with side of canvas
     if (playerX + player_width > canvas.width){
@@ -199,8 +199,14 @@ function computerMovement() {
     }
 }
 
+// Resets enemy
+function resetEnemy() {
+    enemyX = canvas.width;
+    enemyY = canvas.height;
+}
+
 // Resets game
-function reset() {
+function resetGame() {
     playerX = 0;
     playerY = 0;
     enemyX = canvas.width;
