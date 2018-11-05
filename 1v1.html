@@ -1,0 +1,286 @@
+<html>
+some text here
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+
+<script src="bullet.js"></script>
+<script>
+
+
+var canvas;
+var canvasContext;
+
+//player1 variables
+var playerX = 00;
+var playerY = 00;
+var player_height = 50;
+var player_width = 50;
+var timer = 0;
+var playerScore = 0;
+var playerLives = 3;
+
+//neccessary variables
+var tickX = 10;
+var tickY = 10;
+
+//player 1 movement
+var keyW = false;
+var keyS = false;
+var keySpace = false;
+
+//player 2 variables
+var player2X = 750;
+var player2Y = 550;
+var player2_height = 50;
+var player2_width = 50;
+var player2Score = 0;
+var player2Lives = 3;
+
+//player 2 movement
+var keyUpArrow = false;
+var keyDownArrow = false;
+var keyEnter = false;
+
+// Bullet variables
+var i;
+var bulletX = 0;
+var bulletY = 0;
+const BULLET_WIDTH = 25;
+const BULLET_HEIGHT = 25;
+var bullets = [];
+const BULLET_DELAY = 15;
+var bulletDelayTimer = BULLET_DELAY;
+const BULLET_SPEED = 20;
+var NUMBER_OF_BULLETS = 1;
+
+// Obsticle variables
+var obsticle1X = 250;
+var obsticle1Y = 250;
+var obsticle1_width = 30;
+var obsticle1_height = 60;
+var obsticleSpeed = 20;
+
+// Obsticle2 variables
+var obsticle2X = 400;
+var obsticle2Y = 400;
+var obsticle2_width = 30;
+var obsticle2_height = 60;
+var obsticle2Speed = 20;
+
+
+
+var newbullet = new bullet;
+
+window.addEventListener("keydown", onKeyDown, false);
+window.addEventListener("keyup", onKeyUp, false);
+
+function onKeyDown(event) {
+    var keyCode = event.keyCode;
+    switch (keyCode) {
+        case 83: //s
+            keyS = true;
+            break;
+        case 87: //w
+            keyW = true;
+            break;
+        case 32: // space
+            keySpace = true;
+            break;
+        case 38: //up arrow
+        	keyUpArrow = true;
+        	break;
+        case 40: // down arrow
+        	keyDownArrow = true;
+        	break;
+        case 13: // enter key
+        	keyEnter = true;
+    }
+}
+
+function onKeyUp(event) {
+    var keyCode = event.keyCode;
+
+    switch (keyCode) {
+        case 83: //s
+            keyS = false;
+            break;
+        case 87: //w
+            keyW = false;
+            break;
+        case 32: // space
+            keySpace = false;
+            break;
+        case 38: //up arrow
+        	keyUpArrow = false;
+        	break;
+        case 40: // down arrow
+        	keyDownArrow = false;
+        	break;
+        case 13: // enter key
+        	keyEnter = false;
+    }
+}
+
+window.onload = function() {
+	canvas = document.getElementById('gameCanvas');
+	canvasContext = canvas.getContext('2d');
+
+	var framesPerSecond = 30;
+	setInterval(function() {
+			moveEverything();
+			drawEverything();
+            bulletDelayTimer -= 1;
+			}, 1000/framesPerSecond);
+
+}
+
+function moveEverything() {
+    timer += 1/30;
+    for (i = 0; i<bullets.length; i++) {
+        bullets[i].CheckCollision();
+    }
+
+    // KEY SPACE HERE
+    if (keySpace) {
+        if (bulletDelayTimer < 0) {
+            bulletDelayTimer = BULLET_DELAY;
+            newbullet = new bullet();
+            newbullet.Spawn(playerX, playerY,BULLET_SPEED,0);
+            bullets.push(newbullet);
+        }
+    }
+    if (keyEnter) {
+        if (bulletDelayTimer < 0) {
+            bulletDelayTimer = BULLET_DELAY;
+            newbullet = new bullet();
+            newbullet.Spawn(player2X, player2Y,-BULLET_SPEED,1);
+            bullets.push(newbullet);
+        }
+    }
+
+
+    for (i = 0; i<bullets.length; i++) {
+        bullets[i].Update();
+    }
+    bulletX += 20;
+
+    //Obsticle1 movement
+   obsticle1Y = obsticle1Y + obsticleSpeed;
+   if (obsticle1Y > canvas.height){
+   	   obsticleSpeed *= -1 //* (Math.floor((Math.random() * .1) + 1));
+   }
+      
+   obsticle2Y = obsticle2Y + obsticle2Speed;
+   if (obsticle2Y > canvas.height){
+   	   obsticle2Speed *= -1 //* (Math.floor((Math.random() * .1) + 1));;
+   }
+
+    //Obsticle1 movement
+    obsticle1Y = obsticle1Y + obsticleSpeed;
+    if (obsticle1Y < 0){
+        obsticleSpeed *= -1 //* (Math.floor((Math.random() * .1) + 1));;
+    }
+
+    obsticle2Y = obsticle2Y + obsticle2Speed;
+    if (obsticle2Y < 0){
+        obsticle2Speed *= -1 //* (Math.floor((Math.random() * .1) + 1));;
+    }
+
+    //player1 movement
+    if (keyW == true){
+        playerY = playerY - 5
+    }
+    if (keyS == true){
+        playerY = playerY + 5
+    }
+
+    //player2 movement
+    if (keyUpArrow == true){
+    	player2Y = player2Y - 5
+    }
+    if (keyDownArrow == true){
+    	player2Y = player2Y + 5
+    }
+
+
+    //Player collide with side of canvas
+    if (playerX + player_width > canvas.width){
+        playerX = canvas.width - player_width;
+    }
+    if (playerY + player_height > canvas.height){
+        playerY = canvas.height - player_height;
+    }
+    if (playerX  < 0){
+        playerX = 0;
+    }
+    if (playerY  < 0){
+        playerY = 0;
+    }
+
+    //Player 2 collisions with side of canvas
+    if (player2X + player2_width > canvas.width){
+        player2X = canvas.width - player2_width;
+    }
+    if (player2Y + player2_height > canvas.height){
+        player2Y = canvas.height - player2_height;
+    }
+    if (player2X  < 0){
+        player2X = 0;
+    }
+    if (player2Y  < 0){
+        player2Y = 0;
+    }
+}
+
+
+// Resets player 2 to random y position and score + 1
+function resetPlayer2() {
+    player2Y = Math.floor((Math.random() * 600) + 1);;
+    playerScore ++ ;
+}
+
+// Resets player 1 to random y position and score + 1
+function resetPlayer() {
+    playerY = Math.floor((Math.random() * 600) + 1);;
+    player2Score ++ ;
+}
+
+// Draws all shapes needed
+function drawEverything() {
+
+    //canvas
+	canvasContext.fillStyle = 'black';
+	canvasContext.fillRect(0,0,canvas.width,canvas.height);
+
+	//obsticle 1
+	canvasContext.fillStyle = 'orange'
+	canvasContext.fillRect(obsticle1X, obsticle1Y, obsticle1_width, obsticle1_height)
+
+	//obsticle 2
+	canvasContext.fillStyle = 'orange'
+	canvasContext.fillRect(obsticle2X, obsticle2Y, obsticle2_width, obsticle2_height)
+
+	//player2 box
+	canvasContext.fillStyle = 'white';
+	canvasContext.fillRect(player2X, player2Y,player2_width,player2_height);
+
+	//player box
+	canvasContext.fillStyle = 'red';
+	canvasContext.fillRect(playerX,playerY,player_width,player_height);
+
+	//player bullet
+	canvasContext.fillStyle = 'white';
+    canvasContext.fillRect(bulletX,bulletY,BULLET_WIDTH,BULLET_HEIGHT);
+    for (i = 0; i<bullets.length; i++) {
+        bullets[i].Draw();
+    }
+
+    //score text
+    canvasContext.fillText(playerScore, 100, 100);
+
+    //Score player 2 text
+    canvasContext.fillText(player2Score, 700, 100)
+}
+
+</script>
+
+</html>
