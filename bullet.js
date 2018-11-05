@@ -35,4 +35,13 @@ class bullet {
         {this.bulletX = undefined}
 
     }
+
+    bulletCollisions(){
+        if (this.bulletY + BULLET_HEIGHT > canvas.height){
+            this.bulletY = canvas.height - this.bulletY
+        }
+        if (this.bulletY  < 0){
+            this.bulletY = 0;
+        }
+    }
 }

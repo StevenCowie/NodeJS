@@ -2,50 +2,10 @@
 some text here
 <canvas id="gameCanvas" width="800" height="600"></canvas>
 
+<script src="player.js"></script>
 <script src="bullet.js"></script>
 <script>
-
-    class player{
-        Spawn(x,y) {
-            this.playerX = 0;
-            this.playerY = 0;
-
-            this.playerX = x;
-            this.playerY = y;
-        }
-    UpdatePlayer(){
-    if (keyW){
-        this.playerY -= playerSpeed;
-    }
-    if (keyS){
-        this.playerY += playerSpeed;
-    }
-    }
-
-    DrawPlayer(){
-        //player box
-        canvasContext.fillStyle = 'red';
-        canvasContext.fillRect(this.playerX,this.playerY,player_width,player_height);
-    }
-
-    playerCollide(){
-        //Player collide with side of canvas
-        if (this.playerX + player_width > canvas.width){
-            this.playerX = canvas.width - player_width;
-        }
-        if (this.playerY + player_height > canvas.height){
-            this.playerY = canvas.height - player_height;
-        }
-        if (this.playerX  < 0){
-            this.playerX = 0;
-        }
-        if (this.playerY  < 0){
-            this.playerY = 0;
-        }
-    }
-
-    }
-
+    
 var canvas;
 var canvasContext;
 
@@ -189,12 +149,11 @@ function moveEverything() {
         if (bulletDelayTimer < 0) {
             bulletDelayTimer = BULLET_DELAY;
             newbullet = new bullet();
-            newbullet.Spawn(playerX, playerY,BULLET_SPEED,0);
+            newbullet.Spawn(this.playerX, this.playerY,BULLET_SPEED,0);
             bullets.push(newbullet);
         }
     }
     if (keyEnter) {
-        if (bulletDelayTimer < 0) {
         if (bulletDelayTimer < 0) {
             bulletDelayTimer = BULLET_DELAY;
             newbullet = new bullet();
@@ -252,19 +211,19 @@ function moveEverything() {
     }
 
 
-    //Player collide with side of canvas
-    if (playerX + player_width > canvas.width){
-        playerX = canvas.width - player_width;
-    }
-    if (playerY + player_height > canvas.height){
-        playerY = canvas.height - player_height;
-    }
-    if (playerX  < 0){
-        playerX = 0;
-    }
-    if (playerY  < 0){
-        playerY = 0;
-    }
+    // //Player collide with side of canvas
+    // if (playerX + player_width > canvas.width){
+    //     playerX = canvas.width - player_width;
+    // }
+    // if (playerY + player_height > canvas.height){
+    //     playerY = canvas.height - player_height;
+    // }
+    // if (playerX  < 0){
+    //     playerX = 0;
+    // }
+    // if (playerY  < 0){
+    //     playerY = 0;
+    // }
 
     //Player 2 collisions with side of canvas
     if (player2X + player2_width > canvas.width){
@@ -290,6 +249,9 @@ function spawnPlayer(){
 function collisions() {
     for (i = 0; i<players.length; i++) {
         players[i].playerCollide();
+    }
+    for (i=0; i<bullets.length; i++){
+        bullets[i].bulletCollisions();
     }
 }
 
