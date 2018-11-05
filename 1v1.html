@@ -5,6 +5,46 @@ some text here
 <script src="bullet.js"></script>
 <script>
 
+    class player{
+        Spawn(x,y) {
+            this.playerX = 0;
+            this.playerY = 0;
+
+            this.playerX = x;
+            this.playerY = y;
+        }
+    UpdatePlayer(){
+    if (keyW){
+        this.playerY -= playerSpeed;
+    }
+    if (keyS){
+        this.playerY += playerSpeed;
+    }
+    }
+
+    DrawPlayer(){
+        //player box
+        canvasContext.fillStyle = 'red';
+        canvasContext.fillRect(this.playerX,this.playerY,player_width,player_height);
+    }
+
+    playerCollide(){
+        //Player collide with side of canvas
+        if (this.playerX + player_width > canvas.width){
+            this.playerX = canvas.width - player_width;
+        }
+        if (this.playerY + player_height > canvas.height){
+            this.playerY = canvas.height - player_height;
+        }
+        if (this.playerX  < 0){
+            this.playerX = 0;
+        }
+        if (this.playerY  < 0){
+            this.playerY = 0;
+        }
+    }
+
+    }
 
 var canvas;
 var canvasContext;
@@ -16,7 +56,8 @@ var player_height = 50;
 var player_width = 50;
 var timer = 0;
 var playerScore = 0;
-var playerLives = 3;
+var playerSpeed = 5;
+var players = [];
 
 //neccessary variables
 var tickX = 10;
@@ -33,7 +74,6 @@ var player2Y = 550;
 var player2_height = 50;
 var player2_width = 50;
 var player2Score = 0;
-var player2Lives = 3;
 
 //player 2 movement
 var keyUpArrow = false;
@@ -69,9 +109,12 @@ var obsticle2Speed = 20;
 
 
 var newbullet = new bullet;
+var newplayer = new player;
 
 window.addEventListener("keydown", onKeyDown, false);
 window.addEventListener("keyup", onKeyUp, false);
+
+spawnPlayer();
 
 function onKeyDown(event) {
     var keyCode = event.keyCode;
@@ -139,6 +182,8 @@ function moveEverything() {
         bullets[i].CheckCollision();
     }
 
+    collisions();
+
     // KEY SPACE HERE
     if (keySpace) {
         if (bulletDelayTimer < 0) {
@@ -149,6 +194,7 @@ function moveEverything() {
         }
     }
     if (keyEnter) {
+        if (bulletDelayTimer < 0) {
         if (bulletDelayTimer < 0) {
             bulletDelayTimer = BULLET_DELAY;
             newbullet = new bullet();
@@ -162,6 +208,10 @@ function moveEverything() {
         bullets[i].Update();
     }
     bulletX += 20;
+
+    for (i = 0; i<players.length; i++){
+        players[i].UpdatePlayer();
+    }
 
     //Obsticle1 movement
    obsticle1Y = obsticle1Y + obsticleSpeed;
@@ -187,18 +237,18 @@ function moveEverything() {
 
     //player1 movement
     if (keyW == true){
-        playerY = playerY - 5
+        playerY = playerY - playerSpeed
     }
     if (keyS == true){
-        playerY = playerY + 5
+        playerY = playerY + playerSpeed
     }
 
     //player2 movement
     if (keyUpArrow == true){
-    	player2Y = player2Y - 5
+    	player2Y = player2Y - playerSpeed
     }
     if (keyDownArrow == true){
-    	player2Y = player2Y + 5
+    	player2Y = player2Y + playerSpeed
     }
 
 
@@ -231,6 +281,18 @@ function moveEverything() {
     }
 }
 
+function spawnPlayer(){
+    newplayer = new player();
+    newplayer.Spawn(playerX, playerY);
+    players.push(newplayer);
+}
+
+function collisions() {
+    for (i = 0; i<players.length; i++) {
+        players[i].playerCollide();
+    }
+}
+
 
 // Resets player 2 to random y position and score + 1
 function resetPlayer2() {
@@ -251,6 +313,10 @@ function drawEverything() {
 	canvasContext.fillStyle = 'black';
 	canvasContext.fillRect(0,0,canvas.width,canvas.height);
 
+	for (i = 0; i < players.length; i++){
+	    players[i].DrawPlayer();
+    }
+
 	//obsticle 1
 	canvasContext.fillStyle = 'orange'
 	canvasContext.fillRect(obsticle1X, obsticle1Y, obsticle1_width, obsticle1_height)
@@ -264,8 +330,8 @@ function drawEverything() {
 	canvasContext.fillRect(player2X, player2Y,player2_width,player2_height);
 
 	//player box
-	canvasContext.fillStyle = 'red';
-	canvasContext.fillRect(playerX,playerY,player_width,player_height);
+	//canvasContext.fillStyle = 'red';
+	//canvasContext.fillRect(playerX,playerY,player_width,player_height);
 
 	//player bullet
 	canvasContext.fillStyle = 'white';
