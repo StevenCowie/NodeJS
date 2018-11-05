@@ -22,10 +22,10 @@ class bullet {
             this.bulletY + BULLET_HEIGHT > player2Y &&
             this.bulletShooter < 1)
             resetPlayer2();
-        if(this.bulletX + BULLET_WIDTH > playerX &&
-            this.bulletX - BULLET_WIDTH < playerX &&
-            this.bulletY - BULLET_HEIGHT < playerY &&
-            this.bulletY + BULLET_HEIGHT > playerY &&
+        if(this.bulletX + BULLET_WIDTH > players[0].playerX &&
+            this.bulletX - BULLET_WIDTH < players[0].playerX &&
+            this.bulletY - BULLET_HEIGHT < players[0].playerY &&
+            this.bulletY + BULLET_HEIGHT > players[0].playerY &&
             this.bulletShooter > 0)
             resetPlayer();
         if(this.bulletX + BULLET_WIDTH > obsticle1X &&

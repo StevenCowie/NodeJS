@@ -5,7 +5,7 @@ some text here
 <script src="player.js"></script>
 <script src="bullet.js"></script>
 <script>
-    
+
 var canvas;
 var canvasContext;
 
@@ -149,7 +149,7 @@ function moveEverything() {
         if (bulletDelayTimer < 0) {
             bulletDelayTimer = BULLET_DELAY;
             newbullet = new bullet();
-            newbullet.Spawn(this.playerX, this.playerY,BULLET_SPEED,0);
+            newbullet.Spawn(players[0].playerX, players[0].playerY,BULLET_SPEED,0);
             bullets.push(newbullet);
         }
     }
@@ -194,13 +194,13 @@ function moveEverything() {
         obsticle2Speed *= -1 //* (Math.floor((Math.random() * .1) + 1));;
     }
 
-    //player1 movement
-    if (keyW == true){
-        playerY = playerY - playerSpeed
-    }
-    if (keyS == true){
-        playerY = playerY + playerSpeed
-    }
+    // //player1 movement
+    // if (keyW == true){
+    //     playerY = playerY - playerSpeed
+    // }
+    // if (keyS == true){
+    //     playerY = playerY + playerSpeed
+    // }
 
     //player2 movement
     if (keyUpArrow == true){
@@ -264,7 +264,7 @@ function resetPlayer2() {
 
 // Resets player 1 to random y position and score + 1
 function resetPlayer() {
-    playerY = Math.floor((Math.random() * 600) + 1);;
+    players[0].playerY = Math.floor((Math.random() * 600) + 1);;
     player2Score ++ ;
 }
 
