@@ -1,28 +1,32 @@
 class player{
-    Spawn(x,y) {
+    //essential variables for player
+    Spawn(x,y, colour) {
         this.playerX = 0;
         this.playerY = 0;
 
         this.playerX = x;
         this.playerY = y;
+        this.bulletDelayTimer = BULLET_DELAY;
+        this.colour = colour;
     }
-    UpdatePlayer(){
-        if (keyW){
+    //Player movement
+    UpdatePlayer(goUp, goDown){
+        if (goUp){
             this.playerY -= playerSpeed;
         }
-        if (keyS){
+        if (goDown){
             this.playerY += playerSpeed;
         }
     }
 
     DrawPlayer(){
         //player box
-        canvasContext.fillStyle = 'red';
+        canvasContext.fillStyle = this.colour;
         canvasContext.fillRect(this.playerX,this.playerY,player_width,player_height);
     }
 
     playerCollide(){
-        //Player collide with side of canvas
+        //Player collide with side of canvas on both axis
         if (this.playerX + player_width > canvas.width){
             this.playerX = canvas.width - player_width;
         }

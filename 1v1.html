@@ -1,10 +1,34 @@
 <html>
-some text here
+Dead Game Fam
+player 1
+W, S & Space
+Player 2
+Up, Down & Enter
+
 <canvas id="gameCanvas" width="800" height="600"></canvas>
 
 <script src="player.js"></script>
 <script src="bullet.js"></script>
 <script>
+
+	//in progress
+    class obstacles{
+        Spawn(x, y){
+            this.obstacleX = 0;
+            this.obstacleY = 0;
+
+            this.obstacleX = x;
+            this.obstacleY = y;
+        }
+        Update(){
+            this.obstacleY +=  2;
+        }
+        Draw() {
+            canvasContext.fillStyle = 'orange';
+            canvasContext.fillRect(this.obstacleX,this.obstacleY,obsticle1_width,obsticle1_height);
+        }
+
+    }
 
 var canvas;
 var canvasContext;
@@ -16,7 +40,7 @@ var player_height = 50;
 var player_width = 50;
 var timer = 0;
 var playerScore = 0;
-var playerSpeed = 5;
+var playerSpeed = 15;
 var players = [];
 
 //neccessary variables
@@ -64,17 +88,19 @@ var obsticle2X = 400;
 var obsticle2Y = 400;
 var obsticle2_width = 30;
 var obsticle2_height = 60;
-var obsticle2Speed = 20;
+var obsticle2Speed = -20;
 
 
 
 var newbullet = new bullet;
 var newplayer = new player;
+var newobstacle = new obstacles;
 
 window.addEventListener("keydown", onKeyDown, false);
 window.addEventListener("keyup", onKeyUp, false);
 
-spawnPlayer();
+
+spawnPlayers();
 
 function onKeyDown(event) {
     var keyCode = event.keyCode;
@@ -132,6 +158,9 @@ window.onload = function() {
 			moveEverything();
 			drawEverything();
             bulletDelayTimer -= 1;
+        for (i = 0; i<players.length; i++) {
+            players[i].bulletDelayTimer -=1;
+        }
 			}, 1000/framesPerSecond);
 
 }
@@ -143,21 +172,22 @@ function moveEverything() {
     }
 
     collisions();
+    gameOver();
 
-    // KEY SPACE HERE
+    // shooting of bullets
     if (keySpace) {
-        if (bulletDelayTimer < 0) {
-            bulletDelayTimer = BULLET_DELAY;
+        if (players[0].bulletDelayTimer < 0) {
+            players[0].bulletDelayTimer = BULLET_DELAY;
             newbullet = new bullet();
             newbullet.Spawn(players[0].playerX, players[0].playerY,BULLET_SPEED,0);
             bullets.push(newbullet);
         }
     }
     if (keyEnter) {
-        if (bulletDelayTimer < 0) {
-            bulletDelayTimer = BULLET_DELAY;
+        if (players[1].bulletDelayTimer < 0) {
+            players[1].bulletDelayTimer = BULLET_DELAY;
             newbullet = new bullet();
-            newbullet.Spawn(player2X, player2Y,-BULLET_SPEED,1);
+            newbullet.Spawn(players[1].playerX, players[1].playerY,-BULLET_SPEED,1);
             bullets.push(newbullet);
         }
     }
@@ -168,9 +198,9 @@ function moveEverything() {
     }
     bulletX += 20;
 
-    for (i = 0; i<players.length; i++){
-        players[i].UpdatePlayer();
-    }
+    //Assigns players to movement keys
+    players[0].UpdatePlayer(keyW, keyS);
+    players[1].UpdatePlayer(keyUpArrow, keyDownArrow);
 
     //Obsticle1 movement
    obsticle1Y = obsticle1Y + obsticleSpeed;
@@ -194,58 +224,19 @@ function moveEverything() {
         obsticle2Speed *= -1 //* (Math.floor((Math.random() * .1) + 1));;
     }
 
-    // //player1 movement
-    // if (keyW == true){
-    //     playerY = playerY - playerSpeed
-    // }
-    // if (keyS == true){
-    //     playerY = playerY + playerSpeed
-    // }
-
-    //player2 movement
-    if (keyUpArrow == true){
-    	player2Y = player2Y - playerSpeed
-    }
-    if (keyDownArrow == true){
-    	player2Y = player2Y + playerSpeed
-    }
-
-
-    // //Player collide with side of canvas
-    // if (playerX + player_width > canvas.width){
-    //     playerX = canvas.width - player_width;
-    // }
-    // if (playerY + player_height > canvas.height){
-    //     playerY = canvas.height - player_height;
-    // }
-    // if (playerX  < 0){
-    //     playerX = 0;
-    // }
-    // if (playerY  < 0){
-    //     playerY = 0;
-    // }
-
-    //Player 2 collisions with side of canvas
-    if (player2X + player2_width > canvas.width){
-        player2X = canvas.width - player2_width;
-    }
-    if (player2Y + player2_height > canvas.height){
-        player2Y = canvas.height - player2_height;
-    }
-    if (player2X  < 0){
-        player2X = 0;
-    }
-    if (player2Y  < 0){
-        player2Y = 0;
-    }
 }
 
-function spawnPlayer(){
+//spawns players
+function spawnPlayers(){
     newplayer = new player();
-    newplayer.Spawn(playerX, playerY);
+    newplayer.Spawn(playerX, playerY, 'white');
+    players.push(newplayer);
+    newplayer = new player();
+    newplayer.Spawn(750, playerY, 'red');
     players.push(newplayer);
 }
 
+//checks collisions for players and bullets
 function collisions() {
     for (i = 0; i<players.length; i++) {
         players[i].playerCollide();
@@ -258,7 +249,7 @@ function collisions() {
 
 // Resets player 2 to random y position and score + 1
 function resetPlayer2() {
-    player2Y = Math.floor((Math.random() * 600) + 1);;
+    players[1].playerY = Math.floor((Math.random() * 600) + 1);;
     playerScore ++ ;
 }
 
@@ -268,6 +259,16 @@ function resetPlayer() {
     player2Score ++ ;
 }
 
+function gameOver(){
+	//checks to see if a players score is 10 if so game over
+    if(playerScore == 10){
+        alert("Player 1 winner!");
+    }
+    else if (player2Score == 10){
+        alert("Player 2 winner!");
+    }
+}
+
 // Draws all shapes needed
 function drawEverything() {
 
@@ -275,6 +276,7 @@ function drawEverything() {
 	canvasContext.fillStyle = 'black';
 	canvasContext.fillRect(0,0,canvas.width,canvas.height);
 
+	// Draws player
 	for (i = 0; i < players.length; i++){
 	    players[i].DrawPlayer();
     }
@@ -287,14 +289,6 @@ function drawEverything() {
 	canvasContext.fillStyle = 'orange'
 	canvasContext.fillRect(obsticle2X, obsticle2Y, obsticle2_width, obsticle2_height)
 
-	//player2 box
-	canvasContext.fillStyle = 'white';
-	canvasContext.fillRect(player2X, player2Y,player2_width,player2_height);
-
-	//player box
-	//canvasContext.fillStyle = 'red';
-	//canvasContext.fillRect(playerX,playerY,player_width,player_height);
-
 	//player bullet
 	canvasContext.fillStyle = 'white';
     canvasContext.fillRect(bulletX,bulletY,BULLET_WIDTH,BULLET_HEIGHT);
@@ -303,6 +297,7 @@ function drawEverything() {
     }
 
     //score text
+    canvasContext.font = "30px Times New Roman";
     canvasContext.fillText(playerScore, 100, 100);
 
     //Score player 2 text
