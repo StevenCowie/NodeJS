@@ -1,0 +1,309 @@
+<html>
+Dead Game Fam
+player 1
+W, S & Space
+Player 2
+Up, Down & Enter
+
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+
+<script src="player.js"></script>
+<script src="bullet.js"></script>
+<script>
+
+	//in progress
+    class obstacles{
+        Spawn(x, y){
+            this.obstacleX = 0;
+            this.obstacleY = 0;
+
+            this.obstacleX = x;
+            this.obstacleY = y;
+        }
+        Update(){
+            this.obstacleY +=  2;
+        }
+        Draw() {
+            canvasContext.fillStyle = 'orange';
+            canvasContext.fillRect(this.obstacleX,this.obstacleY,obsticle1_width,obsticle1_height);
+        }
+
+    }
+
+var canvas;
+var canvasContext;
+
+//player1 variables
+var playerX = 00;
+var playerY = 00;
+var player_height = 50;
+var player_width = 50;
+var timer = 0;
+var playerScore = 0;
+var playerSpeed = 15;
+var players = [];
+
+//neccessary variables
+var tickX = 10;
+var tickY = 10;
+
+//player 1 movement
+var keyW = false;
+var keyS = false;
+var keySpace = false;
+
+//player 2 variables
+var player2X = 750;
+var player2Y = 550;
+var player2_height = 50;
+var player2_width = 50;
+var player2Score = 0;
+
+//player 2 movement
+var keyUpArrow = false;
+var keyDownArrow = false;
+var keyEnter = false;
+
+// Bullet variables
+var i;
+var bulletX = 0;
+var bulletY = 0;
+const BULLET_WIDTH = 25;
+const BULLET_HEIGHT = 25;
+var bullets = [];
+const BULLET_DELAY = 15;
+var bulletDelayTimer = BULLET_DELAY;
+const BULLET_SPEED = 20;
+var NUMBER_OF_BULLETS = 1;
+
+// Obsticle variables
+var obsticle1X = 250;
+var obsticle1Y = 250;
+var obsticle1_width = 30;
+var obsticle1_height = 60;
+var obsticleSpeed = 20;
+
+// Obsticle2 variables
+var obsticle2X = 400;
+var obsticle2Y = 400;
+var obsticle2_width = 30;
+var obsticle2_height = 60;
+var obsticle2Speed = -20;
+
+
+
+var newbullet = new bullet;
+var newplayer = new player;
+var newobstacle = new obstacles;
+
+window.addEventListener("keydown", onKeyDown, false);
+window.addEventListener("keyup", onKeyUp, false);
+
+
+spawnPlayers();
+
+function onKeyDown(event) {
+    var keyCode = event.keyCode;
+    switch (keyCode) {
+        case 83: //s
+            keyS = true;
+            break;
+        case 87: //w
+            keyW = true;
+            break;
+        case 32: // space
+            keySpace = true;
+            break;
+        case 38: //up arrow
+        	keyUpArrow = true;
+        	break;
+        case 40: // down arrow
+        	keyDownArrow = true;
+        	break;
+        case 13: // enter key
+        	keyEnter = true;
+    }
+}
+
+function onKeyUp(event) {
+    var keyCode = event.keyCode;
+
+    switch (keyCode) {
+        case 83: //s
+            keyS = false;
+            break;
+        case 87: //w
+            keyW = false;
+            break;
+        case 32: // space
+            keySpace = false;
+            break;
+        case 38: //up arrow
+        	keyUpArrow = false;
+        	break;
+        case 40: // down arrow
+        	keyDownArrow = false;
+        	break;
+        case 13: // enter key
+        	keyEnter = false;
+    }
+}
+
+window.onload = function() {
+	canvas = document.getElementById('gameCanvas');
+	canvasContext = canvas.getContext('2d');
+
+	var framesPerSecond = 30;
+	setInterval(function() {
+			moveEverything();
+			drawEverything();
+            bulletDelayTimer -= 1;
+        for (i = 0; i<players.length; i++) {
+            players[i].bulletDelayTimer -=1;
+        }
+			}, 1000/framesPerSecond);
+
+}
+
+function moveEverything() {
+    timer += 1/30;
+    for (i = 0; i<bullets.length; i++) {
+        bullets[i].CheckCollision();
+    }
+
+    collisions();
+    gameOver();
+
+    // shooting of bullets
+    if (keySpace) {
+        if (players[0].bulletDelayTimer < 0) {
+            players[0].bulletDelayTimer = BULLET_DELAY;
+            newbullet = new bullet();
+            newbullet.Spawn(players[0].playerX, players[0].playerY,BULLET_SPEED,0);
+            bullets.push(newbullet);
+        }
+    }
+    if (keyEnter) {
+        if (players[1].bulletDelayTimer < 0) {
+            players[1].bulletDelayTimer = BULLET_DELAY;
+            newbullet = new bullet();
+            newbullet.Spawn(players[1].playerX, players[1].playerY,-BULLET_SPEED,1);
+            bullets.push(newbullet);
+        }
+    }
+
+
+    for (i = 0; i<bullets.length; i++) {
+        bullets[i].Update();
+    }
+    bulletX += 20;
+
+    //Assigns players to movement keys
+    players[0].UpdatePlayer(keyW, keyS);
+    players[1].UpdatePlayer(keyUpArrow, keyDownArrow);
+
+    //Obsticle1 movement
+   obsticle1Y = obsticle1Y + obsticleSpeed;
+   if (obsticle1Y > canvas.height){
+   	   obsticleSpeed *= -1 //* (Math.floor((Math.random() * .1) + 1));
+   }
+      
+   obsticle2Y = obsticle2Y + obsticle2Speed;
+   if (obsticle2Y > canvas.height){
+   	   obsticle2Speed *= -1 //* (Math.floor((Math.random() * .1) + 1));;
+   }
+
+    //Obsticle1 movement
+    obsticle1Y = obsticle1Y + obsticleSpeed;
+    if (obsticle1Y < 0){
+        obsticleSpeed *= -1 //* (Math.floor((Math.random() * .1) + 1));;
+    }
+
+    obsticle2Y = obsticle2Y + obsticle2Speed;
+    if (obsticle2Y < 0){
+        obsticle2Speed *= -1 //* (Math.floor((Math.random() * .1) + 1));;
+    }
+
+}
+
+//spawns players
+function spawnPlayers(){
+    newplayer = new player();
+    newplayer.Spawn(playerX, playerY, 'white');
+    players.push(newplayer);
+    newplayer = new player();
+    newplayer.Spawn(750, playerY, 'red');
+    players.push(newplayer);
+}
+
+//checks collisions for players and bullets
+function collisions() {
+    for (i = 0; i<players.length; i++) {
+        players[i].playerCollide();
+    }
+    for (i=0; i<bullets.length; i++){
+        bullets[i].bulletCollisions();
+    }
+}
+
+
+// Resets player 2 to random y position and score + 1
+function resetPlayer2() {
+    players[1].playerY = Math.floor((Math.random() * 600) + 1);;
+    playerScore ++ ;
+}
+
+// Resets player 1 to random y position and score + 1
+function resetPlayer() {
+    players[0].playerY = Math.floor((Math.random() * 600) + 1);;
+    player2Score ++ ;
+}
+
+function gameOver(){
+	//checks to see if a players score is 10 if so game over
+    if(playerScore == 10){
+        alert("Player 1 winner!");
+    }
+    else if (player2Score == 10){
+        alert("Player 2 winner!");
+    }
+}
+
+// Draws all shapes needed
+function drawEverything() {
+
+    //canvas
+	canvasContext.fillStyle = 'black';
+	canvasContext.fillRect(0,0,canvas.width,canvas.height);
+
+	// Draws player
+	for (i = 0; i < players.length; i++){
+	    players[i].DrawPlayer();
+    }
+
+	//obsticle 1
+	canvasContext.fillStyle = 'orange'
+	canvasContext.fillRect(obsticle1X, obsticle1Y, obsticle1_width, obsticle1_height)
+
+	//obsticle 2
+	canvasContext.fillStyle = 'orange'
+	canvasContext.fillRect(obsticle2X, obsticle2Y, obsticle2_width, obsticle2_height)
+
+	//player bullet
+	canvasContext.fillStyle = 'white';
+    canvasContext.fillRect(bulletX,bulletY,BULLET_WIDTH,BULLET_HEIGHT);
+    for (i = 0; i<bullets.length; i++) {
+        bullets[i].Draw();
+    }
+
+    //score text
+    canvasContext.font = "30px Times New Roman";
+    canvasContext.fillText(playerScore, 100, 100);
+
+    //Score player 2 text
+    canvasContext.fillText(player2Score, 700, 100)
+}
+
+</script>
+
+</html>
